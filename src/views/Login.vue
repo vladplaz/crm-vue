@@ -57,7 +57,7 @@
   export default {
     name: 'login',
     mounted() {
-      if(messages[this.$route.query.message]){
+      if(messages[this.$route.query.message]) {
         this.$message(messages[this.$route.query.message])
       }
     },
@@ -70,16 +70,21 @@
       password: {required, minLength: minLength(6)}
     },
     methods: {
-      submitHandler() {
-        if(this.$v.$invalid){
+      async submitHandler() {
+        if(this.$v.$invalid) {
           this.$v.$touch()
           return
         }
-        const formData={
-          email:this.email,
-          password:this.password
+        const formData = {
+          email: this.email,
+          password: this.password
         }
-        this.$router.push('/')
+        try {
+          await this.$store.dispatch('login',formData)
+          this.$router.push('/')
+        }catch(e) {
+
+        }
       }
     }
   }
