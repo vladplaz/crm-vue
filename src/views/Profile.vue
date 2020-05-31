@@ -1,24 +1,87 @@
 <template>
-    <div>
-        <div class="page-title">
-            <h3>Профиль</h3>
-        </div>
-
-        <form class="form">
-            <div class="input-field">
-                <input
-                        id="description"
-                        type="text"
-                >
-                <label for="description">Имя</label>
-                <span
-                        class="helper-text invalid">name</span>
-            </div>
-
-            <button class="btn waves-effect waves-light" type="submit">
-                Обновить
-                <i class="material-icons right">send</i>
-            </button>
-        </form>
+  <div>
+    <div class="page-title">
+      <h3>{{'ProfileTitle' | localize}}</h3>
     </div>
+
+    <form class="form" @submit.prevent="submitHandler">
+      <div class="input-field">
+        <input
+          id="description"
+          type="text"
+          v-model="name"
+          :class="{invalid:$v.name.$dirty&&!$v.name.required}"
+        >
+        <label for="description">Имя</label>
+        <small class="helper-text invalid"
+               v-if="$v.name.$dirty&&!$v.name.required">
+          {{'Message_EnterName'|localize}}</small>
+      </div>
+      <div class="switch">
+        <label>
+          en
+          <input type="checkbox"
+          v-model="isRuLocale"
+          >
+          <span class="lever"></span>
+          ru
+        </label>
+      </div>
+      <button class="btn waves-effect waves-light" type="submit">
+        {{'Update'|localize}}
+        <i class="material-icons right">send</i>
+      </button>
+    </form>
+  </div>
 </template>
+
+<script>
+  import {mapGetters, mapActions} from 'vuex'
+  import {required} from "vuelidate/lib/validators"
+
+  export default {
+    computed: {
+      ...mapGetters(['info'])
+    },
+    metaInfo() {
+      return {
+        title: this.$title('ProfileTitle')
+      }
+    },
+    data: () => ({
+      name: '',
+      isRuLocale: true
+    }),
+    mounted() {
+      this.name = this.info.name
+      this.isRuLocale = this.info.locale === 'ru-RU'
+      setTimeout(() => M.updateTextFields())
+    },
+    validations: {
+      name: {required}
+    },
+    methods: {
+      ...mapActions['updateInfo'],
+      async submitHandler() {
+        if(this.$v.$invalid) {
+          this.$v.$touch()
+          return
+        }
+        try {
+          await this.$store.dispatch('updateInfo', {
+            name: this.name,
+            locale: this.isRuLocale ? 'ru-RU' : 'en-US'
+          })
+        } catch(e) {
+
+        }
+      }
+    }
+  }
+</script>
+
+<style scoped>
+  .switch{
+    margin-bottom: 2rem;
+  }
+</style>

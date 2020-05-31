@@ -6,6 +6,7 @@
 
 <script>
     import messages from '@/utils/messages'
+
     export default{
         computed:{
             error(){

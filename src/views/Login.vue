@@ -1,7 +1,7 @@
 <template>
   <form class="card auth-card" @submit.prevent="submitHandler">
     <div class="card-content">
-      <span class="card-title">Домашняя бухгалтерия</span>
+      <span class="card-title">{{'CRM_Title'|localize}}</span>
       <div class="input-field">
         <input
           id="email"
@@ -12,9 +12,9 @@
         >
         <label for="email">Email</label>
         <small class="helper-text invalid"
-        v-if="($v.email.$dirty&&!$v.email.required)">Email is required</small>
+        v-if="($v.email.$dirty&&!$v.email.required)">{{'Message_EmailRequired'|localize}}</small>
         <small class="helper-text invalid"
-               v-else-if="($v.email.$dirty&&!$v.email.email)">Input correct Email</small>
+               v-else-if="($v.email.$dirty&&!$v.email.email)">{{'Message_EmailValid'|localize}}</small>
       </div>
       <div class="input-field">
         <input
@@ -26,9 +26,12 @@
         >
         <label for="password">Пароль</label>
         <small class="helper-text invalid"
-               v-if="($v.password.$dirty&&!$v.password.required)">Password is required</small>
+               v-if="($v.password.$dirty&&!$v.password.required)">
+          {{'Message_EnterPassword'|localize}}</small>
         <small class="helper-text invalid"
-               v-else-if="($v.password.$dirty&&!$v.password.minLength)">Password min length 6</small>
+               v-else-if="($v.password.$dirty&&!$v.password.minLength)">
+          {{'Message_MinLength'|localize}} {{$v.password.$params.minLength.min}}
+        </small>
       </div>
     </div>
     <div class="card-action">
@@ -37,14 +40,14 @@
           class="btn waves-effect waves-light auth-submit"
           type="submit"
         >
-          Войти
+          {{'Login'|localize}}
           <i class="material-icons right">send</i>
         </button>
       </div>
 
       <p class="center">
-        Нет аккаунта?
-        <router-link to="/register">Зарегистрироваться</router-link>
+        {{'NoAccount'|localize}}
+        <router-link to="/register">{{'Register'|localize}}</router-link>
       </p>
     </div>
   </form>
@@ -53,18 +56,24 @@
 <script>
   import {email, required, minLength} from 'vuelidate/lib/validators'
   import messages from '@/utils/messages'
+  import localizeFilter from '@/filters/localize.filter'
 
   export default {
     name: 'login',
     mounted() {
       if(messages[this.$route.query.message]) {
-        this.$message(messages[this.$route.query.message])
+        this.$message(localizeFilter(messages[this.$route.query.message]))
       }
     },
     data: () => ({
       email: '',
       password: ''
     }),
+    metaInfo(){
+      return {
+        title: this.$title('Login')
+      }
+    },
     validations: {
       email: {email, required},
       password: {required, minLength: minLength(6)}
